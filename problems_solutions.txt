@@ -1,0 +1,2 @@
+Q1) after login, how to know the state of user logged in without using props?
+Sol - Use context api to maintain user global store

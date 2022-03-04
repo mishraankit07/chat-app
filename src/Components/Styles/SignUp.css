@@ -1,0 +1,12 @@
+.signup-cont{
+    position: absolute;
+    top: 30vh;
+    left: 40vw;
+    width: 25vw;
+}
+
+.signup-info{
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}

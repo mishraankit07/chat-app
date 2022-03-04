@@ -1,0 +1,12 @@
+.login-cont{
+    position: absolute;
+    top: 30vh;
+    left: 40vw;
+    width: 25vw;
+}
+
+.login-info{
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}

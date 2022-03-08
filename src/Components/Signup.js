@@ -54,13 +54,12 @@ export default function Signup() {
             let userData = {
                 name: userName,
                 email: email,
-                documentId: userId
             }
 
             console.log("user object:", userObj);
             console.log("user data:", userData);
 
-            await setDoc(doc(db, 'users', userId), userData);
+            await setDoc(doc(db, 'users', email), userData);
             navigate('/login');
 
         }).catch((error) => {

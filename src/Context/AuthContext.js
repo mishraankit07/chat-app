@@ -20,7 +20,7 @@ export function AuthProvider({ children }) {
     }
 
     function logout() {
-        return signOut();
+        return signOut(auth);
     }
 
     // use effect of type component did mount
@@ -39,6 +39,7 @@ export function AuthProvider({ children }) {
     }, [])
 
     const store = {
+        auth,
         user,
         signup,
         login,

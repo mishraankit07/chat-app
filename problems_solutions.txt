@@ -1,2 +1,5 @@
 Q1) after login, how to know the state of user logged in without using props?
 Sol - Use context api to maintain user global store
+
+Q2) not able to unsubscripe in firebase, so too many logs coming in
+Sol - don't know for now

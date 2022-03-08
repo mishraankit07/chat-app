@@ -1,0 +1,22 @@
+.old-chats-cont{
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    background-color: blue;
+    overflow: auto;
+    gap: 1rem;
+    padding: 1rem;
+}
+
+.chat{
+    width: 20vw; 
+}
+
+.sender-chat{
+    background-color: green;
+}
+
+.reciever-chat{
+    background-color: grey;
+}

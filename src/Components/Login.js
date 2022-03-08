@@ -8,6 +8,7 @@ import './Styles/Login.css'
 import { Link, useNavigate } from 'react-router-dom';
 import { Alert } from '@mui/material';
 import { AuthContext } from '../Context/AuthContext';
+import { Typography } from '@mui/material';
 
 const bull = (
     <Box
@@ -89,6 +90,8 @@ function Login() {
                             disabled={loading}
                             onClick={handleLogin}> Login </Button>
                     </div>
+
+                    <Typography> Don't Have an account ? <Link to='/signup'> Signup </Link> </Typography>
                 </CardContent>
             </Card>
         </Box>

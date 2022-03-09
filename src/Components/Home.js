@@ -33,7 +33,7 @@ export default function Home() {
     const navigate = useNavigate();
     const [userData, setUserData] = useState(null);
     const [friendChats, setFriendChats] = useState(null);
-    const [selectedChat,setSelectedChat]=useState(null);
+    const [selectedChat, setSelectedChat] = useState(null);
 
     // taking the doc id between two people as smaller lexicographic value + '#@!' + larger lexicographic value
     const getChatDocId = (uid1, uid2) => {
@@ -138,37 +138,40 @@ export default function Home() {
         return exists;
     }
 
-    const selectChat=(index)=>{
+    const selectChat = (index) => {
         //console.log("selected chat:",index);
         setSelectedChat(index);
     }
 
     return (
         <div className='home-cont'>
-            <div> {userData == null ? "Loading!" : `Hi ${userData.name}`} </div>
+            <Typography className="user-name-cont" variant='h5'> {userData == null ? "Loading!" : `Hi ${userData.name}`} </Typography>
             <button
                 onClick={handleLogout}> Logout </button>
             <div className="home-content">
-                <div className='users-cont'>
-                    {
-                        friendChats == null ? <CircularProgress /> :
-                            friendChats.map((friendEmail,index) => {
-                                return (
-                                    <div className='user' 
-                                    onClick={()=>selectChat(index)} key={index}>
-                                        <div className='user-info'>
-                                            <Avatar className='user-img'></Avatar>
-                                            <Typography className='user-email'> {friendEmail} </Typography>
+                <Card className='users-cont-card' variant="outlined">
+                    <div className='users-cont'>
+                        <div className='add-friend-banner'> ADD FRIEND </div>
+                        {
+                            friendChats == null ? <CircularProgress /> :
+                                friendChats.map((friendEmail, index) => {
+                                    return (
+                                        <div className='user'
+                                            onClick={() => selectChat(index)} key={index}>
+                                            <div className='user-info'>
+                                                <Avatar className='user-img'></Avatar>
+                                                <Typography className='user-email'> {friendEmail} </Typography>
+                                            </div>
                                         </div>
-                                    </div>
-                                )
-                            })
-                    }
-                </div>
+                                    )
+                                })
+                        }
+                    </div>
+                </Card>
                 <div className='chats-cont'>
                     <Card className='old-chats-card' variant="outlined">
                         <GetChats userData={userData}
-                            recieverEmail={!friendChats || selectedChat==-1 ? -1 : friendChats[selectedChat]}
+                            recieverEmail={!friendChats || selectedChat == -1 ? null : friendChats[selectedChat]}
                             getChatDocId={getChatDocId} />
                     </Card>
 

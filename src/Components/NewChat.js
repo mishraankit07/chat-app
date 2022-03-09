@@ -3,6 +3,7 @@ import { TextField } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
 import { doc, setDoc, getDoc, updateDoc, arrayUnion, onSnapshot } from "firebase/firestore";
 import { db } from '../firebase';
+import './Styles/NewChat.css';
 
 const ariaLabel = { 'aria-label': 'description' };
 
@@ -73,12 +74,13 @@ export default function NewChat({ userData, recieverEmail, getChatDocId, checkDo
 
     return (
         <div className='new-chat-cont'>
-            <TextField
+            <TextField className='new-chat-text'
                 value={latestChat}
                 placeholder='Enter your message'
                 inputProps={ariaLabel}
+                size='small'
                 onChange={(e) => setLatestChat(e.target.value)} />
-            <SendIcon
+            <SendIcon className='send-icon'
                 onClick={handleSendClick}
             />
         </div>

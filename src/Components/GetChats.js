@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { doc, setDoc, getDoc, updateDoc, arrayUnion, onSnapshot, query, collection } from "firebase/firestore";
-import { Typography } from '@mui/material';
+import { Avatar, Typography } from '@mui/material';
 import CircularProgress from '@mui/material/CircularProgress';
 import { db } from '../firebase';
 import './Styles/GetChats.css';
@@ -10,13 +10,9 @@ export default function GetChats({ userData, recieverEmail, getChatDocId }) {
     let [chatData, setChatData] = useState([]);
     let [docExists, setDocExists] = useState(null);
 
-    useEffect(()=>{
-        console.log("reciever email:",recieverEmail);
-    })
-
     useEffect(() => {
 
-        if (userData && recieverEmail != -1) {
+        if (userData!=null && recieverEmail!=null && recieverEmail != undefined) {
 
             async function getData() {
 
@@ -44,25 +40,42 @@ export default function GetChats({ userData, recieverEmail, getChatDocId }) {
                 setChatData([...doc.data().messages]);
             });
 
+            // remove the listner 
             return () => {
                 unsub();
             }
         }
     })
 
+    // dummy one to see variable values 
+    useEffect(() => {
+        //console.log("reciever email:", recieverEmail);
+        //console.log("chats:",chatData);
+    })
+
     return (
-        <div className='old-chats-cont'>
+        <div>
             {
                 (!userData) ? <CircularProgress /> :
-                    (recieverEmail == -1) ? null :
-                        chatData.map((chatObj) => (
-                            <div className='chat-cont'>
-                                {(chatObj.sender == userData.email) ?
-                                    <Typography className='chat sender-chat'> {chatObj.message} </Typography> :
-                                    <Typography className='chat reciever-chat'> {chatObj.message} </Typography>
-                                }
+                    (recieverEmail == null || recieverEmail == undefined) ? <div className='old-chats-cont'></div> :
+                        <div className='old-chats-section'>
+                            <div className='reciever-banner'>
+                                <Avatar> {recieverEmail.split('@')[0][0]} </Avatar>
+                                <Typography> {recieverEmail.split('@')[0]} </Typography>
                             </div>
-                        ))
+                            <div className='old-chats-cont'>
+                                {
+                                    chatData.map((chatObj) => (
+                                        <div className='chat-cont'>
+                                            {
+                                                (chatObj.sender == userData.email) ?
+                                                    <Typography className='chat sender-chat'> {chatObj.message} </Typography> :
+                                                    <Typography className='chat reciever-chat'> {chatObj.message} </Typography>
+                                            }
+                                        </div>
+                                    ))}
+                            </div>
+                        </div>
             }
         </div>
     );

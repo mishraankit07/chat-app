@@ -22,6 +22,10 @@ body{
     justify-content: center;
 }
 
+.add-friend-banner:hover{
+    cursor: pointer;
+}
+
 .home-content{
     width: 80vw;
     height:80vh;
@@ -34,11 +38,13 @@ body{
 .users-cont-card{
     height: 80vh;
     width: 30%;
+    overflow: auto;
 }
 
 .users-cont{
     width: 100%;
     min-height: 100%;
+    position: relative;
     display: flex;
     flex-direction: column;
     gap: 1rem;
@@ -48,8 +54,17 @@ body{
 .user{
     width: 100%;
     height: 7vh;
-    background-color: brown;
-    padding: 0.2rem;
+    background-color: #74b9ff;
+    border-radius: 5%;
+    padding: 0.3rem;
+}
+
+.user:hover{
+    cursor: pointer;
+}
+
+.user-selected{
+    background-color: #0984e3;
 }
 
 .user-info{
@@ -75,11 +90,20 @@ body{
 
 .old-chats-card{
     width: 100%;
-    height: 90%;
-    background-color: brown;
+    min-height: 90%;
 }
 
 .new-chat-card{
     width: 100%;
     height: 10%;
+}
+
+.logout-btn{
+    position: absolute;
+    bottom: 2rem;
+    width: 100%;
+}
+
+.logout-btn:hover{
+    cursor: pointer;
 }

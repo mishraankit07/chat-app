@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { TextField } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
-import { doc, setDoc, getDoc, updateDoc, arrayUnion, onSnapshot } from "firebase/firestore";
+import { doc, setDoc, getDoc, updateDoc, arrayUnion} from "firebase/firestore";
 import { db } from '../firebase';
 import './Styles/NewChat.css';
 
@@ -15,12 +15,15 @@ export default function NewChat({ userData, recieverEmail, getChatDocId, checkDo
 
     const handleSendClick = async () => {
 
-        if (userData) {
+        if (userData && recieverEmail) {
 
             console.log("sending data");
-            let userEmail1 = 'abc@abc.com';
+            let userEmail1 = userData.email;
             // changed here
-            let userEmail2 = 'shyam@shyam.com';
+            let userEmail2 = recieverEmail;
+
+            console.log("user data:",userData);
+            console.log("reciever data:",recieverEmail);
 
             let chatDocId = getChatDocId(userEmail1, userEmail2);
 

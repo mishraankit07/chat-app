@@ -4,6 +4,7 @@ import { Avatar, Typography } from '@mui/material';
 import CircularProgress from '@mui/material/CircularProgress';
 import { db } from '../firebase';
 import './Styles/GetChats.css';
+import { v4 as uuidv4 } from 'uuid';
 
 export default function GetChats({ userData, recieverEmail, getChatDocId }) {
 
@@ -54,7 +55,7 @@ export default function GetChats({ userData, recieverEmail, getChatDocId }) {
     })
 
     return (
-        <div>
+        <div style={{height:"72vh"}}>
             {
                 (!userData) ? <CircularProgress /> :
                     (recieverEmail == null || recieverEmail == undefined) ? <div className='old-chats-cont'></div> :
@@ -66,7 +67,8 @@ export default function GetChats({ userData, recieverEmail, getChatDocId }) {
                             <div className='old-chats-cont'>
                                 {
                                     chatData.map((chatObj) => (
-                                        <div className='chat-cont'>
+                                        
+                                        <div className='chat-cont' key={uuidv4()}>
                                             {
                                                 (chatObj.sender == userData.email) ?
                                                     <Typography className='chat sender-chat'> {chatObj.message} </Typography> :

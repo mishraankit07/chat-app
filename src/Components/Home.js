@@ -21,6 +21,8 @@ import CircularProgress from '@mui/material/CircularProgress';
 import GetChats from './GetChats';
 import NewChat from './NewChat';
 import { collection, query, where, getDocs } from "firebase/firestore";
+import AddFriend from './AddFriend'
+import Button from '@mui/material/Button';
 
 const ariaLabel = { 'aria-label': 'description' };
 
@@ -34,6 +36,7 @@ export default function Home() {
     const [userData, setUserData] = useState(null);
     const [friendChats, setFriendChats] = useState(null);
     const [selectedChat, setSelectedChat] = useState(null);
+    const [addFriendClicked, setAddFriendClicked] = useState(false);
 
     // taking the doc id between two people as smaller lexicographic value + '#@!' + larger lexicographic value
     const getChatDocId = (uid1, uid2) => {
@@ -94,7 +97,9 @@ export default function Home() {
                 querySnapshot.forEach((doc) => {
                     // doc.data() is never undefined for query doc snapshots
                     //console.log("had chats with in q1:", " =>", doc.data());
-                    friendEmails.push(doc.data().userEmail2);
+                    if (doc.data().userEmail2 != userData.email) {
+                        friendEmails.push(doc.data().userEmail2);
+                    }
                 });
 
 
@@ -102,7 +107,9 @@ export default function Home() {
                 querySnapshot1.forEach((doc) => {
                     // doc.data() is never undefined for query doc snapshots
                     //console.log("had chats with in q2:", " =>", doc.data());
-                    friendEmails.push(doc.data().userEmail1);
+                    if (doc.data().userEmail1 != userData.email) {
+                        friendEmails.push(doc.data().userEmail1);
+                    }
                 });
 
                 setFriendChats(friendEmails);
@@ -141,17 +148,33 @@ export default function Home() {
     const selectChat = (index) => {
         //console.log("selected chat:",index);
         setSelectedChat(index);
+        setAddFriendClicked(false);
+
+        let users = document.querySelectorAll('.user');
+        for (let i = 0; i < users.length; i++) {
+            if (index == i) {
+                users[i].classList.add('user-selected');
+            }
+
+            else {
+                users[i].classList.remove('user-selected');
+            }
+        }
+    }
+
+    const handleAddFriend = () => {
+        setAddFriendClicked(true);
+        //console.log("handle add friend clicked");
     }
 
     return (
         <div className='home-cont'>
             <Typography className="user-name-cont" variant='h5'> {userData == null ? "Loading!" : `Hi ${userData.name}`} </Typography>
-            <button
-                onClick={handleLogout}> Logout </button>
+
             <div className="home-content">
                 <Card className='users-cont-card' variant="outlined">
                     <div className='users-cont'>
-                        <div className='add-friend-banner'> ADD FRIEND </div>
+                        <div className='add-friend-banner' onClick={handleAddFriend}> ADD FRIEND </div>
                         {
                             friendChats == null ? <CircularProgress /> :
                                 friendChats.map((friendEmail, index) => {
@@ -167,19 +190,31 @@ export default function Home() {
                                 })
                         }
                     </div>
+                    <Button variant='contained'
+                        className='logout-btn'
+                        size='medium' 
+                        onClick={handleLogout}> Logout </Button>
                 </Card>
                 <div className='chats-cont'>
                     <Card className='old-chats-card' variant="outlined">
-                        <GetChats userData={userData}
-                            recieverEmail={!friendChats || selectedChat == -1 ? null : friendChats[selectedChat]}
-                            getChatDocId={getChatDocId} />
+                        {
+                            addFriendClicked ?
+                                <AddFriend userData={userData}
+                                    getChatDocId={getChatDocId} /> :
+                                <GetChats userData={userData}
+                                    recieverEmail={!friendChats || selectedChat == -1 ? null : friendChats[selectedChat]}
+                                    getChatDocId={getChatDocId} />
+                        }
                     </Card>
 
                     <Card className='new-chat-card' variant='outlined'>
-                        <NewChat userData={userData}
-                            recieverEmail="ram@ram.com"
-                            getChatDocId={getChatDocId}
-                            checkDocExists={checkDocExists} />
+                        {
+
+                            (addFriendClicked == false) ? <NewChat userData={userData}
+                                recieverEmail={!friendChats || selectedChat == -1 ? null : friendChats[selectedChat]}
+                                getChatDocId={getChatDocId}
+                                checkDocExists={checkDocExists} /> : null
+                        }
                     </Card>
                 </div>
             </div>

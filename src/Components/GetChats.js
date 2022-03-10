@@ -7,7 +7,7 @@ import './Styles/GetChats.css';
 import { v4 as uuidv4 } from 'uuid';
 import { List, ListItem } from '@mui/material';
 
-export default function GetChats({ userData, recieverEmail, getChatDocId }) {
+export default function GetChats({ userData, recieverEmail, getChatDocId}) {
 
     let [chatData, setChatData] = useState([]);
     let [docExists, setDocExists] = useState(null);

@@ -128,8 +128,9 @@ export default function Home() {
     }, [])
 
 
-    async function checkDocExists(chatDocId) {
-        const docRef = doc(db, "chats", chatDocId);
+    // checks if a document 
+    async function checkDocExists(collectionName,docId) {
+        const docRef = doc(db, collectionName, docId);
         const docSnap = await getDoc(docRef);
         let exists = false;
 
@@ -141,7 +142,7 @@ export default function Home() {
     }
 
     const selectChat = (index) => {
-        //console.log("selected chat:",index);
+        console.log("selected chat:",index);
         setSelectedChat(index);
         setAddFriendClicked(false);
 
@@ -195,12 +196,15 @@ export default function Home() {
                         {
                             addFriendClicked ?
                                 <AddFriend userData={userData}
-                                    getChatDocId={getChatDocId} /> :
+                                    getChatDocId={getChatDocId}
+                                    friendChats={friendChats} 
+                                    selectChat={selectChat}/> :
                                     
                                     (friendChats!=null && selectedChat!=-1 && selectedChat!=undefined) ? 
                                 <GetChats userData={userData}
                                     recieverEmail={friendChats[selectedChat]}
-                                    getChatDocId={getChatDocId} /> : null
+                                    getChatDocId={getChatDocId} 
+                                    /> : null
                         }
                     </Card>
 
@@ -210,7 +214,8 @@ export default function Home() {
                             (addFriendClicked == false) ? <NewChat userData={userData}
                                 recieverEmail={!friendChats || selectedChat == -1 ? null : friendChats[selectedChat]}
                                 getChatDocId={getChatDocId}
-                                checkDocExists={checkDocExists} /> : null
+                                checkDocExists={checkDocExists}
+                                 /> : null
                         }
                     </Card>
                 </div>

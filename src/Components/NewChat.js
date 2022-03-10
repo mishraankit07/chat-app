@@ -37,16 +37,17 @@ export default function NewChat({ userData, recieverEmail, getChatDocId, checkDo
 
                 // if not the first time chat then update the document
                 if (firstTimeChat == false) {
-                    let chatData = { sender: userData.email, message: latestChat };
+                    let id = uuidv4();
+                    let chatData = { sender: userData.email, message: latestChat, id: id };
                     await updateDoc(chatRef, {
-                        messages: arrayUnion(chatData)
+                        messages: arrayUnion(chatData),
                     });
                 }
 
                 // create a document
                 else {
                     let id = uuidv4();
-                    let chatDocument = { messages: [{ sender: userEmail1, message: latestChat }], id: id, userEmails: [userEmail1, userEmail2] };
+                    let chatDocument = { messages: [{ sender: userEmail1, message: latestChat, id: id }], userEmails: [userEmail1, userEmail2] };
                     console.log("chat document:", chatDocument);
                     await setDoc(chatRef, chatDocument);
                 }

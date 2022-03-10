@@ -8,6 +8,7 @@ import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import { db } from '../firebase';
 import './Styles/AddFriend.css';
+import { v4 as uuidv4 } from 'uuid';
 
 export default function AddFriend({ userData,getChatDocId }) {
 
@@ -62,17 +63,11 @@ export default function AddFriend({ userData,getChatDocId }) {
         let userEmail1 = userData.email;
         let userEmail2 = searchEmail;
 
-        let val = userEmail1.localeCompare(userEmail2);
-        let lowerEmail = userEmail1, higherEmail = userEmail2;
-
-        if (val >= 0) {
-            lowerEmail = userEmail2;
-            higherEmail = userEmail1;
-        }
-
         let chatDocId=getChatDocId(userEmail1,userEmail2);
         const chatRef = doc(db, "chats", chatDocId);
-        let chatDocument = { messages: [{ sender: userEmail1, message: message }], userEmail1: lowerEmail, userEmail2: higherEmail };
+        let id=uuidv4();
+
+        let chatDocument = { messages: [{ sender: userEmail1, message: message }], id:id,userEmails: [userEmail1,userEmail2]};
         await setDoc(chatRef, chatDocument);
 
         setSearchEmail('');

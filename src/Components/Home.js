@@ -23,6 +23,7 @@ import NewChat from './NewChat';
 import { collection, query, where, getDocs } from "firebase/firestore";
 import AddFriend from './AddFriend'
 import Button from '@mui/material/Button';
+import { v4 as uuidv4 } from 'uuid';
 
 const ariaLabel = { 'aria-label': 'description' };
 
@@ -84,41 +85,35 @@ export default function Home() {
     // fetch the chats with which current user is envolved with
     useEffect(() => {
         if (userData) {
+
             const chatsRef = collection(db, "chats");
+            let friendsEmails=[];
+
             // Create a query against the collection.
-            const q1 = query(chatsRef, where("userEmail1", "==", userData.email));
-            const q2 = query(chatsRef, where("userEmail2", "==", userData.email));
+            
+            const unsub=onSnapshot(query(chatsRef, where("userEmails","array-contains", userData.email)),(res)=>{
+                res.docs.map((doc)=>{
 
-            async function getChatUsers() {
-                const querySnapshot = await getDocs(q1);
-                let friendEmails = [];
-
-                // fetch all friends emails
-                querySnapshot.forEach((doc) => {
-                    // doc.data() is never undefined for query doc snapshots
-                    //console.log("had chats with in q1:", " =>", doc.data());
-                    if (doc.data().userEmail2 != userData.email) {
-                        friendEmails.push(doc.data().userEmail2);
+                    if (doc.data().userEmails[0]!=userData.email && friendsEmails.includes(doc.data().userEmails[0])==false){
+                        friendsEmails.push(doc.data().userEmails[0]);
                     }
-                });
 
-
-                const querySnapshot1 = await getDocs(q2);
-                querySnapshot1.forEach((doc) => {
-                    // doc.data() is never undefined for query doc snapshots
-                    //console.log("had chats with in q2:", " =>", doc.data());
-                    if (doc.data().userEmail1 != userData.email) {
-                        friendEmails.push(doc.data().userEmail1);
+                    else if(doc.data().userEmails[1]!=userData.email && friendsEmails.includes(doc.data().userEmails[1])==false){
+                        friendsEmails.push(doc.data().userEmails[1]);
                     }
-                });
+                })
 
-                setFriendChats(friendEmails);
-                //console.log("friends:", friendEmails);
+                console.log("getting friends list:",friendsEmails);
+                //console.log("friends emails:",friendsEmails);
+                setFriendChats([...friendsEmails]);
+            });
+
+            return ()=>{
+                console.log("removing snapshot listners from Home");
+                unsub();
             }
-
-            getChatUsers();
         }
-    })
+    },[userData])
 
     const handleLogout = async () => {
         // console.log("logout called!");
@@ -180,7 +175,7 @@ export default function Home() {
                                 friendChats.map((friendEmail, index) => {
                                     return (
                                         <div className='user'
-                                            onClick={() => selectChat(index)} key={index}>
+                                            onClick={() => selectChat(index)} key={uuidv4()}>
                                             <div className='user-info'>
                                                 <Avatar className='user-img'></Avatar>
                                                 <Typography className='user-email'> {friendEmail} </Typography>
@@ -201,9 +196,11 @@ export default function Home() {
                             addFriendClicked ?
                                 <AddFriend userData={userData}
                                     getChatDocId={getChatDocId} /> :
+                                    
+                                    (friendChats!=null && selectedChat!=-1 && selectedChat!=undefined) ? 
                                 <GetChats userData={userData}
-                                    recieverEmail={!friendChats || selectedChat == -1 ? null : friendChats[selectedChat]}
-                                    getChatDocId={getChatDocId} />
+                                    recieverEmail={friendChats[selectedChat]}
+                                    getChatDocId={getChatDocId} /> : null
                         }
                     </Card>
 

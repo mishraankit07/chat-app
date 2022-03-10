@@ -11,6 +11,7 @@ import { Alert } from '@mui/material';
 import { db } from '../firebase';
 import { doc, setDoc } from "firebase/firestore";
 import { AuthContext } from '../Context/AuthContext';
+import { v4 as uuidv4 } from 'uuid';
 
 
 const bull = (
@@ -50,10 +51,12 @@ export default function Signup() {
             setError('');
             let userObj = userCredential.user;
             let userId = userObj.uid;
+            let id=uuidv4();
 
             let userData = {
                 name: userName,
                 email: email,
+                id:id
             }
 
             console.log("user object:", userObj);

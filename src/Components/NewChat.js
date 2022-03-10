@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { TextField } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
-import { doc, setDoc, getDoc, updateDoc, arrayUnion} from "firebase/firestore";
+import { doc, setDoc, getDoc, updateDoc, arrayUnion } from "firebase/firestore";
 import { db } from '../firebase';
 import './Styles/NewChat.css';
+import { v4 as uuidv4 } from 'uuid';
 
 const ariaLabel = { 'aria-label': 'description' };
 
@@ -22,8 +23,8 @@ export default function NewChat({ userData, recieverEmail, getChatDocId, checkDo
             // changed here
             let userEmail2 = recieverEmail;
 
-            console.log("user data:",userData);
-            console.log("reciever data:",recieverEmail);
+            console.log("user data:", userData);
+            console.log("reciever data:", recieverEmail);
 
             let chatDocId = getChatDocId(userEmail1, userEmail2);
 
@@ -31,35 +32,28 @@ export default function NewChat({ userData, recieverEmail, getChatDocId, checkDo
             let firstTimeChat = !docExists;
 
             // console.log("first time chat:",firstTimeChat);
-                async function addChat() {
-                    const chatRef = doc(db, "chats", chatDocId);
+            async function addChat() {
+                const chatRef = doc(db, "chats", chatDocId);
 
-                    // if not the first time chat then update the document
-                    if (firstTimeChat == false) {
-                        let chatData = { sender: userData.email, message: latestChat };
-                        await updateDoc(chatRef, {
-                            messages: arrayUnion(chatData)
-                        });
-                    }
-
-                    // create a document
-                    else {
-
-                        let val = userEmail1.localeCompare(userEmail2);
-                        let lowerEmail = userEmail1, higherEmail = userEmail2;
-
-                        if (val >= 0) {
-                            lowerEmail = userEmail2;
-                            higherEmail = userEmail1;
-                        }
-
-                        let chatDocument = { messages: [{ sender: userEmail1, message: latestChat }], userEmail1: lowerEmail, userEmail2: higherEmail };
-                        await setDoc(chatRef, chatDocument);
-                    }
-                    setLatestChat('');
+                // if not the first time chat then update the document
+                if (firstTimeChat == false) {
+                    let chatData = { sender: userData.email, message: latestChat };
+                    await updateDoc(chatRef, {
+                        messages: arrayUnion(chatData)
+                    });
                 }
 
-                addChat();
+                // create a document
+                else {
+                    let id = uuidv4();
+                    let chatDocument = { messages: [{ sender: userEmail1, message: latestChat }], id: id, userEmails: [userEmail1, userEmail2] };
+                    console.log("chat document:", chatDocument);
+                    await setDoc(chatRef, chatDocument);
+                }
+                setLatestChat('');
+            }
+
+            addChat();
         }
 
         // user id 1 user id 2

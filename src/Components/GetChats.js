@@ -5,6 +5,7 @@ import CircularProgress from '@mui/material/CircularProgress';
 import { db } from '../firebase';
 import './Styles/GetChats.css';
 import { v4 as uuidv4 } from 'uuid';
+import { List, ListItem } from '@mui/material';
 
 export default function GetChats({ userData, recieverEmail, getChatDocId }) {
 
@@ -13,7 +14,7 @@ export default function GetChats({ userData, recieverEmail, getChatDocId }) {
 
     useEffect(() => {
 
-        if (userData!=null && recieverEmail!=null && recieverEmail != undefined) {
+        if (userData != null && recieverEmail != null && recieverEmail != undefined) {
 
             async function getData() {
 
@@ -22,31 +23,34 @@ export default function GetChats({ userData, recieverEmail, getChatDocId }) {
 
                 // console.log("chat doc id:",chatDocId);
 
-                if (docExists == null) {
+                /*if (docExists == null) {
                     const docRef = doc(db, "chats", chatDocId);
                     const docSnap = await getDoc(docRef);
 
                     setDocExists(docSnap.exists());
-                }
+                } */
             }
 
-            getData();
-        }
+            //getData();
 
 
-        if (docExists == true) {
+            //if (docExists == true) {
+            console.log("getting chats for:", userData.email, "from:", recieverEmail);
+
             let chatDocId = getChatDocId(userData.email, recieverEmail);
+
             const unsub = onSnapshot(doc(db, "chats", chatDocId), (doc) => {
-                //console.log("Current data: ", doc.data());
+                console.log("chats data: ", doc.data().messages);
                 setChatData([...doc.data().messages]);
             });
 
             // remove the listner 
-            return () => {
+            /*return () => {
                 unsub();
-            }
+            }*/
+            //}
         }
-    })
+    },[userData,recieverEmail])
 
     // dummy one to see variable values 
     useEffect(() => {
@@ -55,7 +59,7 @@ export default function GetChats({ userData, recieverEmail, getChatDocId }) {
     })
 
     return (
-        <div style={{height:"72vh"}}>
+        <div style={{ height: "72vh" }}>
             {
                 (!userData) ? <CircularProgress /> :
                     (recieverEmail == null || recieverEmail == undefined) ? <div className='old-chats-cont'></div> :
@@ -64,19 +68,22 @@ export default function GetChats({ userData, recieverEmail, getChatDocId }) {
                                 <Avatar> {recieverEmail.split('@')[0][0]} </Avatar>
                                 <Typography> {recieverEmail.split('@')[0]} </Typography>
                             </div>
-                            <div className='old-chats-cont'>
-                                {
-                                    chatData.map((chatObj) => (
-                                        
-                                        <div className='chat-cont' key={uuidv4()}>
-                                            {
-                                                (chatObj.sender == userData.email) ?
-                                                    <Typography className='chat sender-chat'> {chatObj.message} </Typography> :
-                                                    <Typography className='chat reciever-chat'> {chatObj.message} </Typography>
-                                            }
-                                        </div>
-                                    ))}
-                            </div>
+                            {
+                                <div className='old-chats-cont'>
+                                    {
+                                        chatData.map((chatObj) => (
+
+                                            <div className='chat-cont' key={chatObj.id}>
+                                                {
+                                                    (chatObj.sender == userData.email) ?
+                                                        <Typography className='chat sender-chat'> {chatObj.message} </Typography> :
+                                                        <Typography className='chat reciever-chat'> {chatObj.message} </Typography>
+                                                }
+                                            </div>
+                                        ))
+                                    }
+                                </div>
+                            }
                         </div>
             }
         </div>

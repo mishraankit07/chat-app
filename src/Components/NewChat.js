@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState,useContext } from 'react';
 import { TextField } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
 import { doc, setDoc, getDoc, updateDoc, arrayUnion } from "firebase/firestore";
 import { db } from '../firebase';
 import './Styles/NewChat.css';
+import { AuthContext } from '../Context/AuthContext';
 import { v4 as uuidv4 } from 'uuid';
 
 const ariaLabel = { 'aria-label': 'description' };
@@ -12,7 +13,7 @@ const ariaLabel = { 'aria-label': 'description' };
 export default function NewChat({ userData, recieverEmail, getChatDocId, checkDocExists }) {
 
     const [latestChat, setLatestChat] = useState('');
-
+    const {getTimeStamp}=useContext(AuthContext);
 
     const handleSendClick = async () => {
 
@@ -38,7 +39,7 @@ export default function NewChat({ userData, recieverEmail, getChatDocId, checkDo
                 // if not the first time chat then update the document
                 if (firstTimeChat == false) {
                     let id = uuidv4();
-                    let chatData = { sender: userData.email, message: latestChat, id: id };
+                    let chatData = { sender: userData.email, message: latestChat, id: id,createdAt:getTimeStamp() };
                     await updateDoc(chatRef, {
                         messages: arrayUnion(chatData),
                     });
@@ -47,7 +48,7 @@ export default function NewChat({ userData, recieverEmail, getChatDocId, checkDo
                 // create a document
                 else {
                     let id = uuidv4();
-                    let chatDocument = { messages: [{ sender: userEmail1, message: latestChat, id: id }], userEmails: [userEmail1, userEmail2] };
+                    let chatDocument = { messages: [{ sender: userEmail1, message: latestChat, id: id }], userEmails: [userEmail1, userEmail2], createdAt:getTimeStamp() };
                     console.log("chat document:", chatDocument);
                     await setDoc(chatRef, chatDocument);
                 }

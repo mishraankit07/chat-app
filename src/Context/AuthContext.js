@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword,signOut } from "firebase/auth";
+import firebase from 'firebase/compat/app';
 
 
 // creating a global store
@@ -23,6 +24,11 @@ export function AuthProvider({ children }) {
         return signOut(auth);
     }
 
+    // this needs a fix
+    function getTimeStamp(){
+        return Date();
+    }
+
     // use effect of type component did mount
     // attaching a listener to see if auth token state has changed or not
     useEffect(() => {
@@ -43,7 +49,8 @@ export function AuthProvider({ children }) {
         user,
         signup,
         login,
-        logout
+        logout,
+        getTimeStamp
     }
 
     return (

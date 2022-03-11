@@ -43,21 +43,20 @@ function Login() {
         setError('');
 
         login(email, password).then(() => {
-            setLoading(false);
             setError('');
 
             // console.log("user successfully logged in!");
             navigate('/');
+            setLoading(false);
         })
             .catch((error) => {
                 setError(error.code);
 
                 setInterval(() => {
                     setError('');
+                    setLoading(false);
                 }, 5000)
             })
-
-        setLoading(false);
     }
 
     return (
@@ -91,7 +90,7 @@ function Login() {
                             onClick={handleLogin}> Login </Button>
                     </div>
 
-                    <Typography> Don't Have an account ? <Link to='/signup'> Signup </Link> </Typography>
+                    <Typography style={{marginTop:"1rem",textAlign:"center"}}> Don't Have an account ? <Link to='/signup'> Signup </Link> </Typography>
                 </CardContent>
             </Card>
         </Box>

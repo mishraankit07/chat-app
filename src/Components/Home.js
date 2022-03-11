@@ -11,9 +11,6 @@ import { AuthContext } from '../Context/AuthContext';
 import './Styles/Home.css';
 import { useNavigate } from 'react-router-dom';
 import { doc, setDoc, getDoc, updateDoc, arrayUnion, onSnapshot } from "firebase/firestore";
-import Users from './Users';
-import SendIcon from '@mui/icons-material/Send';
-import TextField from '@mui/material/TextField';
 import { db } from '../firebase';
 import { Avatar, Typography } from '@mui/material';
 import Card from '@mui/material/Card';
@@ -146,6 +143,8 @@ export default function Home() {
         setSelectedChat(index);
         setAddFriendClicked(false);
 
+        
+
         let users = document.querySelectorAll('.user');
         for (let i = 0; i < users.length; i++) {
             if (index == i) {
@@ -165,7 +164,7 @@ export default function Home() {
 
     return (
         <div className='home-cont'>
-            <Typography className="user-name-cont" variant='h5'> {userData == null ? "Loading!" : `Hi ${userData.name}`} </Typography>
+            <Typography className="user-name-cont" variant='h5'> {userData == null ? "Fetching Your Data, just a second!" : `Hi ${userData.name}`} </Typography>
 
             <div className="home-content">
                 <Card className='users-cont-card' variant="outlined">
@@ -211,8 +210,8 @@ export default function Home() {
                     <Card className='new-chat-card' variant='outlined'>
                         {
 
-                            (addFriendClicked == false) ? <NewChat userData={userData}
-                                recieverEmail={!friendChats || selectedChat == -1 ? null : friendChats[selectedChat]}
+                            (addFriendClicked == false && selectedChat!=null) ? <NewChat userData={userData}
+                                recieverEmail={!friendChats || selectedChat == null ? null : friendChats[selectedChat]}
                                 getChatDocId={getChatDocId}
                                 checkDocExists={checkDocExists}
                                  /> : null

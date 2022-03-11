@@ -51,29 +51,30 @@ export default function Signup() {
             setError('');
             let userObj = userCredential.user;
             let userId = userObj.uid;
-            let id=uuidv4();
+            let id = uuidv4();
 
             let userData = {
                 name: userName,
                 email: email,
-                id:id
+                id: id
             }
 
             console.log("user object:", userObj);
             console.log("user data:", userData);
 
             await setDoc(doc(db, 'users', email), userData);
-            navigate('/login');
+            navigate('/');
+            setLoading(false);
 
         }).catch((error) => {
             setError(error.code);
             console.log(error.message);
             setInterval(() => {
                 setError('');
+                setLoading(false);
             }, 5000)
         })
 
-        setLoading(false);
         setError('');
     }
 
@@ -115,7 +116,7 @@ export default function Signup() {
                             disabled={loading}> SignUp </Button>
                     </div>
                 </CardContent>
-                <Typography style={{ textAlign: "center" }}> Already a user ? <Link to="/login"> Login </Link></Typography>
+                <Typography style={{ textAlign: "center", marginTop: '0.5rem',marginBottom:"0.5rem" }}> Already a user ? <Link to="/login"> Login </Link></Typography>
             </Card>
         </Box>
     );

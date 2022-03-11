@@ -4,37 +4,15 @@ import { Avatar, Typography } from '@mui/material';
 import CircularProgress from '@mui/material/CircularProgress';
 import { db } from '../firebase';
 import './Styles/GetChats.css';
-import { v4 as uuidv4 } from 'uuid';
-import { List, ListItem } from '@mui/material';
 
 export default function GetChats({ userData, recieverEmail, getChatDocId}) {
 
     let [chatData, setChatData] = useState([]);
-    let [docExists, setDocExists] = useState(null);
-
+    
     useEffect(() => {
 
         if (userData != null && recieverEmail != null && recieverEmail != undefined) {
 
-            async function getData() {
-
-                // console.log("user email:",userData.email);
-                let chatDocId = getChatDocId(userData.email, recieverEmail);
-
-                // console.log("chat doc id:",chatDocId);
-
-                /*if (docExists == null) {
-                    const docRef = doc(db, "chats", chatDocId);
-                    const docSnap = await getDoc(docRef);
-
-                    setDocExists(docSnap.exists());
-                } */
-            }
-
-            //getData();
-
-
-            //if (docExists == true) {
             console.log("getting chats for:", userData.email, "from:", recieverEmail);
 
             let chatDocId = getChatDocId(userData.email, recieverEmail);
@@ -45,18 +23,12 @@ export default function GetChats({ userData, recieverEmail, getChatDocId}) {
             });
 
             // remove the listner 
-            /*return () => {
+            return () => {
                 unsub();
-            }*/
-            //}
+            }
         }
     },[userData,recieverEmail])
 
-    // dummy one to see variable values 
-    useEffect(() => {
-        //console.log("reciever email:", recieverEmail);
-        //console.log("chats:",chatData);
-    })
 
     return (
         <div style={{ height: "72vh" }}>

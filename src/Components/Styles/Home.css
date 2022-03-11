@@ -59,6 +59,7 @@ body{
     padding: 0.3rem;
     display: flex;
     gap: 0.5rem;
+    overflow: hidden;
 }
 
 .user:hover{

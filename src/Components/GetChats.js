@@ -7,27 +7,10 @@ import './Styles/GetChats.css';
 
 export default function GetChats({ chatDataHome, userData, recieverEmail, getChatDocId }) {
 
-    /*let [chatData, setChatData] = useState([]);
-    
     useEffect(() => {
-
-        if (userData != null && recieverEmail != null && recieverEmail != undefined) {
-
-            console.log("getting chats for:", userData.email, "from:", recieverEmail);
-
-            let chatDocId = getChatDocId(userData.email, recieverEmail);
-
-            const unsub = onSnapshot(doc(db, "chats", chatDocId), (doc) => {
-                console.log("chats data: ", doc.data().messages);
-                setChatData([...doc.data().messages]);
-            });
-
-            // remove the listner 
-            return () => {
-                unsub();
-            }
-        }
-    },[userData,recieverEmail]) */
+        let chatsCont = document.querySelector('.old-chats-cont');
+        chatsCont.scrollTo(0, chatsCont.scrollHeight);
+    })
 
 
     return (

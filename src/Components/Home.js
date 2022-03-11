@@ -22,6 +22,7 @@ import AddFriend from './AddFriend'
 import Button from '@mui/material/Button';
 import { v4 as uuidv4 } from 'uuid';
 import AddAlertIcon from '@mui/icons-material/AddAlert';
+import { ListItem } from '@mui/material';
 
 const ariaLabel = { 'aria-label': 'description' };
 
@@ -146,20 +147,28 @@ export default function Home() {
         return exists;
     }
 
-    const selectChat = (index) => {
+    const selectChat = async (index) => {
         console.log("selected chat:", index);
         setSelectedChat(index);
         setAddFriendClicked(false);
 
+
         let users = document.querySelectorAll('.user');
         for (let i = 0; i < users.length; i++) {
-            if (i == index) {
-                users[i].classList.add('user-selected');
-            }
-
-            else {
                 users[i].classList.remove('user-selected');
-            }
+        }
+
+        users[index].classList.add('user-selected');
+        console.log(users[index]);
+
+        // if the last message was sent by the login user itself, then don't remove the notification 
+        if (chats[index].messages[chats[index].messages.length - 1].sender != userData.email) {
+            let chatDocId = getChatDocId(userData.email, friendChats[index]);
+            const chatRef = doc(db, "chats", chatDocId);
+
+            await updateDoc(chatRef, {
+                recieverHasRead: true
+            });
         }
     }
 
@@ -175,25 +184,26 @@ export default function Home() {
             <div className="home-content">
                 <Card className='users-cont-card' variant="outlined">
                     <div className='add-friend-banner' onClick={handleAddFriend}> ADD FRIEND </div>
-                    <div className='users-cont'>
+                    <List className='users-cont'>
                         {
                             friendChats == null || chats == null ? <CircularProgress /> :
                                 chats.map((chatObj, index) => {
                                     return (
                                         
-                                        <div className='user'
+                                        <ListItem className='user'
+                                            selected={selectedChat==index}
                                             onClick={() => selectChat(index)} key={uuidv4()}>
-                                            <Avatar sx={{ height: "3rem", width: "3rem" }}></Avatar>
+                                            <Avatar sx={{ height: "3rem", width: "3rem" }}> {chatObj.userEmails.filter((email) => { return (email != userData.email) })[0].split('@')[0][0]} </Avatar>
                                             <div className='user-info'>
                                                 <Typography className='user-email'> {friendChats[index]} </Typography>
-                                                <Typography> {chatObj.messages[chatObj.messages.length - 1].message.substring(0, 30)} </Typography>
+                                                <Typography component='span'> {chatObj.messages[chatObj.messages.length - 1].message.substring(0, 30)} </Typography>
                                             </div>
-                                            <AddAlertIcon style={{display:`${1}`}}/>
-                                        </div>
+                                            {(chatObj.messages[chatObj.messages.length - 1].sender != userData.email) && (chatObj.recieverHasRead == false) ? <AddAlertIcon /> : null}
+                                        </ListItem>
                                     )
                                 })
                         }
-                    </div>
+                    </List>
                     <Button variant='contained'
                         className='logout-btn'
                         size='medium'

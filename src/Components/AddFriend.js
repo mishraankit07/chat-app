@@ -15,7 +15,7 @@ export default function AddFriend({ userData, getChatDocId, friendChats, selectC
     const [message, setMessage] = useState('');
     const [error, setError] = useState('');
     const { getTimeStamp } = useContext(AuthContext);
-    const [loading,setLoading]=useState(false);
+    const [loading, setLoading] = useState(false);
 
     const handleEmailType = (val) => {
         setSearchEmail(val);
@@ -62,9 +62,11 @@ export default function AddFriend({ userData, getChatDocId, friendChats, selectC
             if (chatExists) {
                 let id = uuidv4();
                 // 1) then send the message
-                let chatData = { sender: userData.email, message: message, id: id, createdAt: getTimeStamp() };
+                let chatData = { sender: userData.email, message: message, id: id, createdAt: getTimeStamp()};
+                // for every new message sent mark it hasn't been read yet
                 await updateDoc(chatRef, {
-                    messages: arrayUnion(chatData)
+                    messages: arrayUnion(chatData),
+                    recieverHasRead: false
                 });
 
                 // 2) redirect to that chat index
@@ -82,7 +84,7 @@ export default function AddFriend({ userData, getChatDocId, friendChats, selectC
             // create a new chat with the user
             else {
                 let id = uuidv4();
-                let chatDocument = { messages: [{ sender: userEmail1, message: message, id: id, createdAt: getTimeStamp() }], userEmails: [userEmail1, userEmail2] };
+                let chatDocument = { messages: [{ sender: userEmail1, message: message, id: id, createdAt: getTimeStamp() }], userEmails: [userEmail1, userEmail2], recieverHasRead: false };
                 await setDoc(chatRef, chatDocument);
                 setLoading(false);
             }

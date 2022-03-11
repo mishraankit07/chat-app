@@ -1,16 +1,27 @@
-# About
+## About
 Chap App is a 1-1 chat app built using react as frontend and firebase as backend.
 
-# Features
+<br>
+
+## Features
 1. Login using firebase
 2. Chat With New People Registered on the platform via email 
-3. 
 
-# Getting Started with Create React App
+<br> 
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
-## Available Scripts
+ ## Features To work upon
+ -  [  ] Icon to show unread messages
+ -  [  ] Create Group Chats
+ -  [  ] Improve UI (currently bare bones only)   
+
+
+<br>
+
+
+## Project Setup Information
+
+### Available Scripts
 
 In the project directory, you can run:
 

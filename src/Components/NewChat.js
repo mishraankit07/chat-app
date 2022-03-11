@@ -29,7 +29,7 @@ export default function NewChat({ userData, recieverEmail, getChatDocId, checkDo
 
             let chatDocId = getChatDocId(userEmail1, userEmail2);
 
-            let docExists = await checkDocExists(chatDocId);
+            let docExists = await checkDocExists('chats',chatDocId);
             let firstTimeChat = !docExists;
 
             // console.log("first time chat:",firstTimeChat);
@@ -58,7 +58,9 @@ export default function NewChat({ userData, recieverEmail, getChatDocId, checkDo
             addChat();
         }
 
-        // user id 1 user id 2
+        // thought
+        
+        // user email 1 user email 2
         // let docId=userId1 + '#@!' + userId2;
         // if no chat exists between user id 1 and user id 2
         // create an empty document

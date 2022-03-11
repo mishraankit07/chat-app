@@ -21,6 +21,7 @@ import { collection, query, where, getDocs } from "firebase/firestore";
 import AddFriend from './AddFriend'
 import Button from '@mui/material/Button';
 import { v4 as uuidv4 } from 'uuid';
+import AddAlertIcon from '@mui/icons-material/AddAlert';
 
 const ariaLabel = { 'aria-label': 'description' };
 
@@ -34,7 +35,9 @@ export default function Home() {
     const [userData, setUserData] = useState(null);
     const [friendChats, setFriendChats] = useState(null);
     const [selectedChat, setSelectedChat] = useState(null);
+    const [chats, setChats] = useState(null);
     const [addFriendClicked, setAddFriendClicked] = useState(false);
+    let [chatData, setChatData] = useState([]);
 
     // taking the doc id between two people as smaller lexicographic value + '#@!' + larger lexicographic value
     const getChatDocId = (uid1, uid2) => {
@@ -59,6 +62,7 @@ export default function Home() {
     }
 
 
+    // get user data
     useEffect(() => {
 
         if (user) {
@@ -84,33 +88,37 @@ export default function Home() {
         if (userData) {
 
             const chatsRef = collection(db, "chats");
-            let friendsEmails=[];
-
             // Create a query against the collection.
-            
-            const unsub=onSnapshot(query(chatsRef, where("userEmails","array-contains", userData.email)),(res)=>{
-                res.docs.map((doc)=>{
 
-                    if (doc.data().userEmails[0]!=userData.email && friendsEmails.includes(doc.data().userEmails[0])==false){
-                        friendsEmails.push(doc.data().userEmails[0]);
-                    }
+            const unsub = onSnapshot(query(chatsRef, where("userEmails", "array-contains", userData.email)), (res) => {
+                let chatsArr = [];
 
-                    else if(doc.data().userEmails[1]!=userData.email && friendsEmails.includes(doc.data().userEmails[1])==false){
-                        friendsEmails.push(doc.data().userEmails[1]);
-                    }
+                res.docs.map((doc, index) => {
+                    chatsArr.push(doc.data());
                 })
 
-                console.log("getting friends list:",friendsEmails);
-                //console.log("friends emails:",friendsEmails);
+                let friendsEmails = [];
+
+                chatsArr.forEach((chatObj) => {
+                    chatObj.userEmails.forEach((email) => {
+                        if (email != userData.email) {
+                            friendsEmails.push(email)
+                        }
+                    })
+                })
+                // console.log("friends emails:",friendsEmails);
+
+
                 setFriendChats([...friendsEmails]);
+                setChats([...chatsArr]);
             });
 
-            return ()=>{
+            return () => {
                 console.log("removing snapshot listners from Home");
                 unsub();
             }
         }
-    },[userData])
+    }, [userData])
 
     const handleLogout = async () => {
         // console.log("logout called!");
@@ -126,7 +134,7 @@ export default function Home() {
 
 
     // checks if a document 
-    async function checkDocExists(collectionName,docId) {
+    async function checkDocExists(collectionName, docId) {
         const docRef = doc(db, collectionName, docId);
         const docSnap = await getDoc(docRef);
         let exists = false;
@@ -139,15 +147,13 @@ export default function Home() {
     }
 
     const selectChat = (index) => {
-        console.log("selected chat:",index);
+        console.log("selected chat:", index);
         setSelectedChat(index);
         setAddFriendClicked(false);
 
-        
-
         let users = document.querySelectorAll('.user');
         for (let i = 0; i < users.length; i++) {
-            if (index == i) {
+            if (i == index) {
                 users[i].classList.add('user-selected');
             }
 
@@ -168,18 +174,21 @@ export default function Home() {
 
             <div className="home-content">
                 <Card className='users-cont-card' variant="outlined">
+                    <div className='add-friend-banner' onClick={handleAddFriend}> ADD FRIEND </div>
                     <div className='users-cont'>
-                        <div className='add-friend-banner' onClick={handleAddFriend}> ADD FRIEND </div>
                         {
-                            friendChats == null ? <CircularProgress /> :
-                                friendChats.map((friendEmail, index) => {
+                            friendChats == null || chats == null ? <CircularProgress /> :
+                                chats.map((chatObj, index) => {
                                     return (
+                                        
                                         <div className='user'
                                             onClick={() => selectChat(index)} key={uuidv4()}>
+                                            <Avatar sx={{ height: "3rem", width: "3rem" }}></Avatar>
                                             <div className='user-info'>
-                                                <Avatar className='user-img'></Avatar>
-                                                <Typography className='user-email'> {friendEmail} </Typography>
+                                                <Typography className='user-email'> {friendChats[index]} </Typography>
+                                                <Typography> {chatObj.messages[chatObj.messages.length - 1].message.substring(0, 30)} </Typography>
                                             </div>
+                                            <AddAlertIcon style={{display:`${1}`}}/>
                                         </div>
                                     )
                                 })
@@ -187,7 +196,7 @@ export default function Home() {
                     </div>
                     <Button variant='contained'
                         className='logout-btn'
-                        size='medium' 
+                        size='medium'
                         onClick={handleLogout}> Logout </Button>
                 </Card>
                 <div className='chats-cont'>
@@ -196,13 +205,14 @@ export default function Home() {
                             addFriendClicked ?
                                 <AddFriend userData={userData}
                                     getChatDocId={getChatDocId}
-                                    friendChats={friendChats} 
-                                    selectChat={selectChat}/> :
-                                    
-                                    (friendChats!=null && selectedChat!=-1 && selectedChat!=undefined) ? 
-                                <GetChats userData={userData}
-                                    recieverEmail={friendChats[selectedChat]}
-                                    getChatDocId={getChatDocId} 
+                                    friendChats={friendChats}
+                                    selectChat={selectChat} /> :
+
+                                (friendChats != null && selectedChat != -1 && selectedChat != undefined) ?
+                                    <GetChats chatDataHome={chats[selectedChat].messages}
+                                        userData={userData}
+                                        recieverEmail={friendChats[selectedChat]}
+                                        getChatDocId={getChatDocId}
                                     /> : null
                         }
                     </Card>
@@ -210,11 +220,11 @@ export default function Home() {
                     <Card className='new-chat-card' variant='outlined'>
                         {
 
-                            (addFriendClicked == false && selectedChat!=null) ? <NewChat userData={userData}
+                            (addFriendClicked == false && selectedChat != null) ? <NewChat userData={userData}
                                 recieverEmail={!friendChats || selectedChat == null ? null : friendChats[selectedChat]}
                                 getChatDocId={getChatDocId}
                                 checkDocExists={checkDocExists}
-                                 /> : null
+                            /> : null
                         }
                     </Card>
                 </div>

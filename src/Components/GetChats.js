@@ -5,9 +5,9 @@ import CircularProgress from '@mui/material/CircularProgress';
 import { db } from '../firebase';
 import './Styles/GetChats.css';
 
-export default function GetChats({ userData, recieverEmail, getChatDocId}) {
+export default function GetChats({ chatDataHome, userData, recieverEmail, getChatDocId }) {
 
-    let [chatData, setChatData] = useState([]);
+    /*let [chatData, setChatData] = useState([]);
     
     useEffect(() => {
 
@@ -27,7 +27,7 @@ export default function GetChats({ userData, recieverEmail, getChatDocId}) {
                 unsub();
             }
         }
-    },[userData,recieverEmail])
+    },[userData,recieverEmail]) */
 
 
     return (
@@ -43,7 +43,7 @@ export default function GetChats({ userData, recieverEmail, getChatDocId}) {
                             {
                                 <div className='old-chats-cont'>
                                     {
-                                        chatData.map((chatObj) => (
+                                        chatDataHome.map((chatObj) => (
 
                                             <div className='chat-cont' key={chatObj.id}>
                                                 {

@@ -1,4 +1,4 @@
-import React, { useState,useContext } from 'react';
+import React, { useState, useContext } from 'react';
 import { TextField } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
 import { doc, setDoc, getDoc, updateDoc, arrayUnion } from "firebase/firestore";
@@ -13,7 +13,7 @@ const ariaLabel = { 'aria-label': 'description' };
 export default function NewChat({ userData, recieverEmail, getChatDocId, checkDocExists }) {
 
     const [latestChat, setLatestChat] = useState('');
-    const {getTimeStamp}=useContext(AuthContext);
+    const { getTimeStamp } = useContext(AuthContext);
 
     const handleSendClick = async () => {
 
@@ -29,7 +29,7 @@ export default function NewChat({ userData, recieverEmail, getChatDocId, checkDo
 
             let chatDocId = getChatDocId(userEmail1, userEmail2);
 
-            let docExists = await checkDocExists('chats',chatDocId);
+            let docExists = await checkDocExists('chats', chatDocId);
             let firstTimeChat = !docExists;
 
             // console.log("first time chat:",firstTimeChat);
@@ -39,7 +39,7 @@ export default function NewChat({ userData, recieverEmail, getChatDocId, checkDo
                 // if not the first time chat then update the document
                 if (firstTimeChat == false) {
                     let id = uuidv4();
-                    let chatData = { sender: userData.email, message: latestChat, id: id,createdAt:getTimeStamp() };
+                    let chatData = { sender: userData.email, message: latestChat, id: id, createdAt: getTimeStamp() };
                     await updateDoc(chatRef, {
                         messages: arrayUnion(chatData),
                     });
@@ -48,7 +48,9 @@ export default function NewChat({ userData, recieverEmail, getChatDocId, checkDo
                 // create a document
                 else {
                     let id = uuidv4();
-                    let chatDocument = { messages: [{ sender: userEmail1, message: latestChat, id: id }], userEmails: [userEmail1, userEmail2], createdAt:getTimeStamp() };
+                    let chatDocument = { messages: 
+                        [{ sender: userEmail1, message: latestChat, id: id, createdAt: getTimeStamp() }], 
+                        userEmails: [userEmail1, userEmail2] };
                     console.log("chat document:", chatDocument);
                     await setDoc(chatRef, chatDocument);
                 }
@@ -59,7 +61,7 @@ export default function NewChat({ userData, recieverEmail, getChatDocId, checkDo
         }
 
         // thought
-        
+
         // user email 1 user email 2
         // let docId=userId1 + '#@!' + userId2;
         // if no chat exists between user id 1 and user id 2

@@ -10,9 +10,8 @@ import { Typography } from '@mui/material';
 import { AuthContext } from '../Context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 
-export default function AddFriendNav({userData,handleLogout,handleAddFriend}) {
+export default function AddFriendNav({userData,handleLogout,handleAddFriend,handleCreateGroup}) {
     
-    const { logout } = useContext(AuthContext);
     const [anchorEl, setAnchorEl] = React.useState(null);
     const navigate = useNavigate();
 
@@ -29,6 +28,11 @@ export default function AddFriendNav({userData,handleLogout,handleAddFriend}) {
     const handleAddFriendFn=()=>{
         handleClose();
         handleAddFriend();
+    }
+
+    const handleCreateGroupFn=()=>{
+        handleClose();
+        handleCreateGroup();
     }
 
     const handleClose = () => {
@@ -68,6 +72,7 @@ export default function AddFriendNav({userData,handleLogout,handleAddFriend}) {
                             onClose={handleClose}
                         >
                             <MenuItem onClick={handleAddFriendFn}> Add Friend </MenuItem>
+                            <MenuItem onClick={handleCreateGroupFn}> Create Group </MenuItem>
                             <MenuItem onClick={handleLogoutFn}> Logout </MenuItem>
 
                         </Menu>

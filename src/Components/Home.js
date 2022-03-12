@@ -34,6 +34,7 @@ import FormGroup from '@mui/material/FormGroup';
 import MenuItem from '@mui/material/MenuItem';
 import Menu from '@mui/material/Menu';
 import AddFriendNav from './AddFriendNav';
+import CreateGroup from './CreateGroup';
 
 const ariaLabel = { 'aria-label': 'description' };
 
@@ -49,6 +50,12 @@ export default function Home() {
     const [selectedChat, setSelectedChat] = useState(null);
     const [chats, setChats] = useState(null);
     const [addFriendClicked, setAddFriendClicked] = useState(false);
+    const [createGroupClicked, setCreateGroupClicked] = useState(false);
+    const [showGroupChats, setShowGroupChats] = useState(false);
+
+    const handleCreateGroup = () => {
+        setCreateGroupClicked(true);
+    }
 
     // taking the doc id between two people as smaller lexicographic value + '#@!' + larger lexicographic value
     const getChatDocId = (uid1, uid2) => {
@@ -117,6 +124,8 @@ export default function Home() {
                         }
                     })
                 })
+
+                console.log("chats:", chatsArr);
                 // console.log("friends emails:",friendsEmails);
 
 
@@ -130,6 +139,46 @@ export default function Home() {
             }
         }
     }, [userData])
+
+    // fetch the groups with which current user is envolved with
+    useEffect(() => {
+        if (userData) {
+
+            const groupsRef = collection(db, "groups");
+            // Create a query against the collection.
+
+            const unsub = onSnapshot(query(groupsRef, where("userEmails", "array-contains", userData.email)), (res) => {
+                let chatsArr = [];
+
+                res.docs.map((doc, index) => {
+                    chatsArr.push(doc.data());
+                })
+
+                /* let friendsEmails = [];
+
+                chatsArr.forEach((chatObj) => {
+                    chatObj.userEmails.forEach((email) => {
+                        if (email != userData.email) {
+                            friendsEmails.push(email)
+                        }
+                    })
+                }) */
+
+                console.log("group chats:", chatsArr);
+                // console.log("friends emails:",friendsEmails);
+
+
+                // setFriendChats([...friendsEmails]);
+                // setChats([...chatsArr]);
+            });
+
+            return () => {
+                console.log("removing snapshot listners in group chat from Home");
+                unsub();
+            }
+        }
+    }, [userData])
+
 
     const handleLogout = async () => {
         // console.log("logout called!");
@@ -162,15 +211,6 @@ export default function Home() {
         setSelectedChat(index);
         setAddFriendClicked(false);
 
-
-        let users = document.querySelectorAll('.user');
-        for (let i = 0; i < users.length; i++) {
-            users[i].classList.remove('user-selected');
-        }
-
-        users[index].classList.add('user-selected');
-        console.log(users[index]);
-
         // if the last message was sent by the login user itself, then don't remove the notification 
         if (chats[index].messages[chats[index].messages.length - 1].sender != userData.email) {
             let chatDocId = getChatDocId(userData.email, friendChats[index]);
@@ -187,14 +227,23 @@ export default function Home() {
         //console.log("handle add friend clicked");
     }
 
+    const handleSwitchToggle=(e)=>{
+        setShowGroupChats(!showGroupChats);
+    }
+
     return (
         <div className='home-cont'>
             <div className="home-content">
                 <Card className='users-cont-card' variant="outlined">
-                    <AddFriendNav userData={userData} handleAddFriend={handleAddFriend} handleLogout={handleLogout}/>
+                    <AddFriendNav userData={userData} handleAddFriend={handleAddFriend} handleCreateGroup={handleCreateGroup} handleLogout={handleLogout} />
+                    <FormGroup style={{display:"flex", height:"5vh" ,alignItems:"center"}}>
+                        <FormControlLabel control={<Switch onChange={handleSwitchToggle}/>} label="Groups" />
+                    </FormGroup>
+
                     <List className='users-cont'>
                         {
-                            friendChats == null || chats == null ? <CircularProgress /> :
+                            showGroupChats ? <div> Hey from group chats </div> : 
+                            (friendChats == null || chats == null) ? <CircularProgress /> :
                                 chats.map((chatObj, index) => {
                                     return (
 
@@ -217,18 +266,22 @@ export default function Home() {
                 <div className='chats-cont'>
                     <Card className='old-chats-card' variant="outlined">
                         {
-                            addFriendClicked ?
-                                <AddFriend userData={userData}
-                                    getChatDocId={getChatDocId}
-                                    friendChats={friendChats}
-                                    selectChat={selectChat} /> :
-
-                                (friendChats != null && selectedChat != -1 && selectedChat != undefined) ?
-                                    <GetChats chatDataHome={chats[selectedChat].messages}
-                                        userData={userData}
-                                        recieverEmail={friendChats[selectedChat]}
+                            createGroupClicked ?
+                                <CreateGroup
+                                    userData={userData}
+                                    checkDocExists={checkDocExists} /> :
+                                addFriendClicked ?
+                                    <AddFriend userData={userData}
                                         getChatDocId={getChatDocId}
-                                    /> : null
+                                        friendChats={friendChats}
+                                        selectChat={selectChat} /> :
+
+                                    (friendChats != null && selectedChat != -1 && selectedChat != undefined) ?
+                                        <GetChats chatDataHome={chats[selectedChat].messages}
+                                            userData={userData}
+                                            recieverEmail={friendChats[selectedChat]}
+                                            getChatDocId={getChatDocId}
+                                        /> : null
                         }
                     </Card>
 

@@ -25,6 +25,11 @@
     padding: 1rem;
 }
 
+.chat-cont{
+    width: 100%;
+    display: flex;
+}
+
 .chat{
     width: 20vw; 
     padding: 0.2rem;
@@ -33,6 +38,7 @@
 
 .sender-chat{
     background-color: green;
+    justify-self: flex-end;
 }
 
 .reciever-chat{

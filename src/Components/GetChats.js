@@ -4,6 +4,7 @@ import { Avatar, Typography } from '@mui/material';
 import CircularProgress from '@mui/material/CircularProgress';
 import { db } from '../firebase';
 import './Styles/GetChats.css';
+import UserChatsNav from './UserChatsNav';
 
 export default function GetChats({ chatDataHome, userData, recieverEmail, getChatDocId }) {
 
@@ -14,27 +15,26 @@ export default function GetChats({ chatDataHome, userData, recieverEmail, getCha
 
 
     return (
-        <div style={{ height: "72vh" }}>
+        <div style={{ height: "80vh" }}>
             {
                 (!userData) ? <CircularProgress /> :
                     (recieverEmail == null || recieverEmail == undefined) ? <div className='old-chats-cont'></div> :
                         <div className='old-chats-section'>
-                            <div className='reciever-banner'>
-                                <Avatar> {recieverEmail.split('@')[0][0]} </Avatar>
-                                <Typography> {recieverEmail.split('@')[0]} </Typography>
-                            </div>
+                            <UserChatsNav recieverEmail={recieverEmail} />
                             {
                                 <div className='old-chats-cont'>
                                     {
                                         chatDataHome.map((chatObj) => (
-
-                                            <div className='chat-cont' key={chatObj.id}>
+                                            <React.Fragment>
                                                 {
                                                     (chatObj.sender == userData.email) ?
-                                                        <Typography className='chat sender-chat'> {chatObj.message} </Typography> :
-                                                        <Typography className='chat reciever-chat'> {chatObj.message} </Typography>
+                                                        <div className='chat-cont' key={chatObj.id}>
+                                                            <Typography className='chat sender-chat'> {chatObj.message} </Typography> </div> :
+                                                        <div className='chat-cont' key={chatObj.id}>
+                                                            <Typography className='chat reciever-chat'> {chatObj.message} </Typography>
+                                                        </div>
                                                 }
-                                            </div>
+                                            </React.Fragment>
                                         ))
                                     }
                                 </div>

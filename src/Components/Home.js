@@ -23,6 +23,17 @@ import Button from '@mui/material/Button';
 import { v4 as uuidv4 } from 'uuid';
 import AddAlertIcon from '@mui/icons-material/AddAlert';
 import { ListItem } from '@mui/material';
+import AppBar from '@mui/material/AppBar';
+import Toolbar from '@mui/material/Toolbar';
+import IconButton from '@mui/material/IconButton';
+import MenuIcon from '@mui/icons-material/Menu';
+import AccountCircle from '@mui/icons-material/AccountCircle';
+import Switch from '@mui/material/Switch';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import FormGroup from '@mui/material/FormGroup';
+import MenuItem from '@mui/material/MenuItem';
+import Menu from '@mui/material/Menu';
+import AddFriendNav from './AddFriendNav';
 
 const ariaLabel = { 'aria-label': 'description' };
 
@@ -38,7 +49,6 @@ export default function Home() {
     const [selectedChat, setSelectedChat] = useState(null);
     const [chats, setChats] = useState(null);
     const [addFriendClicked, setAddFriendClicked] = useState(false);
-    let [chatData, setChatData] = useState([]);
 
     // taking the doc id between two people as smaller lexicographic value + '#@!' + larger lexicographic value
     const getChatDocId = (uid1, uid2) => {
@@ -155,7 +165,7 @@ export default function Home() {
 
         let users = document.querySelectorAll('.user');
         for (let i = 0; i < users.length; i++) {
-                users[i].classList.remove('user-selected');
+            users[i].classList.remove('user-selected');
         }
 
         users[index].classList.add('user-selected');
@@ -179,24 +189,22 @@ export default function Home() {
 
     return (
         <div className='home-cont'>
-            <Typography className="user-name-cont" variant='h5'> {userData == null ? "Fetching Your Data, just a second!" : `Hi ${userData.name}`} </Typography>
-
             <div className="home-content">
                 <Card className='users-cont-card' variant="outlined">
-                    <div className='add-friend-banner' onClick={handleAddFriend}> ADD FRIEND </div>
+                    <AddFriendNav userData={userData} handleAddFriend={handleAddFriend} handleLogout={handleLogout}/>
                     <List className='users-cont'>
                         {
                             friendChats == null || chats == null ? <CircularProgress /> :
                                 chats.map((chatObj, index) => {
                                     return (
-                                        
+
                                         <ListItem className='user'
-                                            selected={selectedChat==index}
+                                            selected={selectedChat == index}
                                             onClick={() => selectChat(index)} key={uuidv4()}>
                                             <Avatar sx={{ height: "3rem", width: "3rem" }}> {chatObj.userEmails.filter((email) => { return (email != userData.email) })[0].split('@')[0][0]} </Avatar>
                                             <div className='user-info'>
                                                 <Typography className='user-email'> {friendChats[index]} </Typography>
-                                                <Typography component='span'> {chatObj.messages[chatObj.messages.length - 1].message.substring(0, 30)} </Typography>
+                                                <Typography> {chatObj.messages[chatObj.messages.length - 1].message.substring(0, 25)} </Typography>
                                             </div>
                                             {(chatObj.messages[chatObj.messages.length - 1].sender != userData.email) && (chatObj.recieverHasRead == false) ? <AddAlertIcon /> : null}
                                         </ListItem>
@@ -204,11 +212,8 @@ export default function Home() {
                                 })
                         }
                     </List>
-                    <Button variant='contained'
-                        className='logout-btn'
-                        size='medium'
-                        onClick={handleLogout}> Logout </Button>
                 </Card>
+
                 <div className='chats-cont'>
                     <Card className='old-chats-card' variant="outlined">
                         {

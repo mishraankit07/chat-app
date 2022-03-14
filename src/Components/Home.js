@@ -45,6 +45,7 @@ export default function Home() {
     const [selectedGroupChat, setSelectedGroupChat] = useState(null);
 
     const handleCreateGroup = () => {
+        setAddFriendClicked(false);
         setCreateGroupClicked(true);
     }
 
@@ -240,7 +241,9 @@ export default function Home() {
     }
 
     const handleAddFriend = () => {
+        setCreateGroupClicked(false);
         setAddFriendClicked(true);
+
         //console.log("handle add friend clicked");
     }
 
@@ -281,12 +284,12 @@ export default function Home() {
                                     groupChats.map((groupObj, index) => {
                                         return (
                                             <ListItem className='user'
-                                                selected={selectedChat == index}
+                                                selected={selectedGroupChat == index}
                                                 onClick={() => selectGroupChat(index)} key={uuidv4()}>
                                                 <Avatar sx={{ height: "3rem", width: "3rem" }}> {groupObj.groupName[0]} </Avatar>
                                                 <div className='user-info'>
                                                     <Typography className='user-email'> {groupObj.groupName} </Typography>
-                                                    <Typography> {groupObj.messages[groupObj.messages.length - 1].sender + ':' + groupObj.messages[groupObj.messages.length - 1].message.substring(0, 15)} </Typography>
+                                                    <Typography> {groupObj.messages[groupObj.messages.length - 1].sender + ':' + groupObj.messages[groupObj.messages.length - 1].message.substring(0, 10)} </Typography>
                                                 </div>
                                                 {(groupObj.messages[groupObj.messages.length - 1].sender != userData.email) && (groupObj.recieversRead.includes(userData.email)==false) ? <AddAlertIcon /> : null}
                                             </ListItem>
@@ -321,7 +324,9 @@ export default function Home() {
                             createGroupClicked ?
                                 <CreateGroup
                                     userData={userData}
-                                    checkDocExists={checkDocExists} /> :
+                                    checkDocExists={checkDocExists}
+                                    groupChats={groupChats}
+                                    selectGroupChatFn={selectGroupChat} /> :
                                 addFriendClicked ?
                                     <AddFriend userData={userData}
                                         getChatDocId={getChatDocId}

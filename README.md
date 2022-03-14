@@ -1,19 +1,22 @@
 ## About
-Chap App is a 1-1 chat app built using react as frontend and firebase as backend.
+Firechat is a chat app built using react as frontend and firebase as backend which allows users to chat.
 
 <br>
 
-## Features
-1. Login using firebase
-2. Chat With New People Registered on the platform via email 
+## Features Implemeneted
+1. Login using firebase.
+2. 1-1 Chat with people registered on the platform via email. 
+3. Want to talk to multiple friends simultaneously ? create a group by adding other user emails in comma seperated fashion.
+4. Get notifications for a new message. 
 
 <br> 
 
 
  ## Features To work upon
- -  [  ] Icon to show unread messages
- -  [  ] Create Group Chats
- -  [  ] Improve UI (currently bare bones only)   
+ -  [ x ] Icon to show unread messages
+ -  [ x ] Create Group Chats
+ -  [   ] Allow making rooms to chat with people without you/them having to login by just using the room id   
+ -  [   ] Improve UI (currently bare bones only)   
 
 
 <br>

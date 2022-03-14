@@ -5,10 +5,9 @@ import { v4 as uuidv4 } from 'uuid';
 import { AuthContext } from '../Context/AuthContext';
 import { doc, setDoc, getDoc, updateDoc, arrayUnion } from "firebase/firestore";
 import { db } from '../firebase';
-
 import './Styles/CreateGroup.css';
 
-export default function CreateGroup({ userData, checkDocExists }) {
+export default function CreateGroup({ userData, checkDocExists,groupChats,selectGroupChatFn }) {
 
     const [groupName, setGroupName] = useState('');
     const [emails, setEmails] = useState('');
@@ -16,25 +15,9 @@ export default function CreateGroup({ userData, checkDocExists }) {
     const [loading, setLoading] = useState(false);
     const { getTimeStamp } = useContext(AuthContext);
 
-    //console.log("check doc exists:",checkDocExists);
-
-    const getGroupDocId = (email1, email2) => {
-
-        let val = email1.localeCompare(email2);
-        let groupDocId = email2 + '#@!' + email1;
-
-        // uid1 is lexicographically smaller 
-        if (val < 0) {
-            groupDocId = email1 + '#@!' + email2;
-        }
-
-        // console.log("returning:", chatDocId);
-        return groupDocId;
-
-    }
-
     const handleSubmitClick = async () => {
 
+        setLoading(true);
         let emailsList = emails.trim().split(',');
         emailsList.push(userData.email);
 
@@ -50,7 +33,7 @@ export default function CreateGroup({ userData, checkDocExists }) {
         // console.log("group data:",dataObj);
         // console.log("group id:",groupDocId);
 
-        let docExists = false;//await checkDocExists('groups', groupDocId);
+        let docExists = await checkDocExists('groups', groupDocId);
         let firstTimeChat = !docExists;
 
         const docRef = doc(db, "groups", groupDocId);
@@ -64,6 +47,7 @@ export default function CreateGroup({ userData, checkDocExists }) {
                 recieversRead:[]
             }
             await setDoc(docRef, groupDocument);
+            setLoading(false);
         }
 
         // the group already exists so update the document only
@@ -74,7 +58,22 @@ export default function CreateGroup({ userData, checkDocExists }) {
                 messages: arrayUnion(chatData),
                 recieverHasRead: false
             });
+            
+
+            setLoading(false);
+
+            // show that group as active for now
+            for(let i=0;i<groupChats.length;i++){
+                if(groupChats[i].groupName==groupName){
+                    selectGroupChatFn(i);
+                }
+            }
         }
+
+        setGroupName('');
+        setEmails('');
+        setMessage('');
+
 
     }
 

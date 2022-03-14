@@ -13,10 +13,10 @@ Firechat is a chat app built using react as frontend and firebase as backend whi
 
 
  ## Features To work upon
- -  [ x ] Icon to show unread messages
- -  [ x ] Create Group Chats
- -  [   ] Allow making rooms to chat with people without you/them having to login by just using the room id   
- -  [   ] Improve UI (currently bare bones only)   
+ -  [x] Icon to show unread messages
+ -  [x] Create Group Chats
+ -  [ ] Allow making rooms to chat with people without you/them having to login by just using the room id   
+ -  [ ] Improve UI (currently bare bones only)   
 
 
 <br>

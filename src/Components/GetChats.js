@@ -20,7 +20,7 @@ export default function GetChats({ chatDataHome, userData, recieverEmail, getCha
                 (!userData) ? <CircularProgress /> :
                     (recieverEmail == null || recieverEmail == undefined) ? <div className='old-chats-cont'></div> :
                         <div className='old-chats-section'>
-                            <UserChatsNav recieverEmail={recieverEmail} />
+                            <UserChatsNav name={recieverEmail.trim().split('@')[0]} />
                             {
                                 <div className='old-chats-cont'>
                                     {

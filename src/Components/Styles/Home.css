@@ -37,7 +37,7 @@ body{
 
 .users-cont{
     width: 100%;
-    height: calc(100% - 7vh - 1rem);
+    height: calc(100% - 7vh - 5vh - 1rem);
     display: flex;
     flex-direction: column;
     gap: 0.5rem;

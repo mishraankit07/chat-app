@@ -1,16 +1,9 @@
 import React, { useState, useEffect, useContext } from 'react';
-import Box from '@mui/material/Box';
 import List from '@mui/material/List';
-import ListItemButton from '@mui/material/ListItemButton';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import ListItemText from '@mui/material/ListItemText';
-import Divider from '@mui/material/Divider';
-import InboxIcon from '@mui/icons-material/Inbox';
-import DraftsIcon from '@mui/icons-material/Drafts';
 import { AuthContext } from '../Context/AuthContext';
 import './Styles/Home.css';
 import { useNavigate } from 'react-router-dom';
-import { doc, setDoc, getDoc, updateDoc, arrayUnion, onSnapshot } from "firebase/firestore";
+import { doc, getDoc, updateDoc, arrayUnion, onSnapshot } from "firebase/firestore";
 import { db } from '../firebase';
 import { Avatar, Typography } from '@mui/material';
 import Card from '@mui/material/Card';
@@ -19,21 +12,16 @@ import GetChats from './GetChats';
 import NewChat from './NewChat';
 import { collection, query, where, getDocs } from "firebase/firestore";
 import AddFriend from './AddFriend'
-import Button from '@mui/material/Button';
 import { v4 as uuidv4 } from 'uuid';
 import AddAlertIcon from '@mui/icons-material/AddAlert';
 import { ListItem } from '@mui/material';
-import AppBar from '@mui/material/AppBar';
-import Toolbar from '@mui/material/Toolbar';
-import IconButton from '@mui/material/IconButton';
-import MenuIcon from '@mui/icons-material/Menu';
-import AccountCircle from '@mui/icons-material/AccountCircle';
 import Switch from '@mui/material/Switch';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import FormGroup from '@mui/material/FormGroup';
-import MenuItem from '@mui/material/MenuItem';
-import Menu from '@mui/material/Menu';
 import AddFriendNav from './AddFriendNav';
+import CreateGroup from './CreateGroup';
+import GetGroupChats from './GetGroupChats';
+import NewGroupChat from './NewGroupChat';
 
 const ariaLabel = { 'aria-label': 'description' };
 
@@ -45,10 +33,20 @@ export default function Home() {
     const { auth } = useContext(AuthContext);
     const navigate = useNavigate();
     const [userData, setUserData] = useState(null);
+
     const [friendChats, setFriendChats] = useState(null);
     const [selectedChat, setSelectedChat] = useState(null);
     const [chats, setChats] = useState(null);
     const [addFriendClicked, setAddFriendClicked] = useState(false);
+
+    const [createGroupClicked, setCreateGroupClicked] = useState(false);
+    const [showGroupChats, setShowGroupChats] = useState(false);
+    const [groupChats, setGroupChats] = useState(null);
+    const [selectedGroupChat, setSelectedGroupChat] = useState(null);
+
+    const handleCreateGroup = () => {
+        setCreateGroupClicked(true);
+    }
 
     // taking the doc id between two people as smaller lexicographic value + '#@!' + larger lexicographic value
     const getChatDocId = (uid1, uid2) => {
@@ -117,6 +115,8 @@ export default function Home() {
                         }
                     })
                 })
+
+                // console.log("chats:", chatsArr);
                 // console.log("friends emails:",friendsEmails);
 
 
@@ -130,6 +130,34 @@ export default function Home() {
             }
         }
     }, [userData])
+
+    // fetch the groups with which current user is envolved with
+    useEffect(() => {
+        if (userData) {
+
+            const groupsRef = collection(db, "groups");
+            // Create a query against the collection.
+
+            const unsub = onSnapshot(query(groupsRef, where("userEmails", "array-contains", userData.email)), (res) => {
+                let chatsArr = [];
+
+                res.docs.map((doc, index) => {
+                    chatsArr.push(doc.data());
+                })
+
+                console.log("complete group chats:", chatsArr);
+                // console.log("friends emails:",friendsEmails);
+
+                setGroupChats(chatsArr);
+            });
+
+            return () => {
+                console.log("removing snapshot listners in group chat from Home");
+                unsub();
+            }
+        }
+    }, [userData])
+
 
     const handleLogout = async () => {
         // console.log("logout called!");
@@ -157,19 +185,48 @@ export default function Home() {
         return exists;
     }
 
-    const selectChat = async (index) => {
-        console.log("selected chat:", index);
-        setSelectedChat(index);
-        setAddFriendClicked(false);
+    const selectGroupChat = async (index) => {
+
+        console.log("called!");
+        if (groupChats) {
+
+            // console.log("selected group chat:", selectGroupChat);
+            // console.log("selected group chat data from home:", groupChats[index]);
+            // console.log("selected group chat name from home:", groupChats[index].groupName);
+
+            // if the user himself has not sent the message
+            if (groupChats[index].messages[groupChats[index].messages.length - 1].sender != userData.email) {
+                let groupChatDocId = groupChats[index].groupName;
+
+                let emailsList=groupChats[index].userEmails.sort();
+
+                for(let i=0;i<emailsList.length;i++){
+                    groupChatDocId=groupChatDocId + '#@!' + emailsList[i];
+                }
 
 
-        let users = document.querySelectorAll('.user');
-        for (let i = 0; i < users.length; i++) {
-            users[i].classList.remove('user-selected');
+                console.log("group chats doc id in home:",groupChatDocId);
+                const chatRef = doc(db, "groups", groupChatDocId);
+
+                // current user has read the latest message
+                await updateDoc(chatRef, {
+                    recieversRead: arrayUnion(userData.email)
+                });
+            }
+
+            setSelectedGroupChat(index);
+            setSelectedChat(null);
+            setCreateGroupClicked(false);
+
         }
 
-        users[index].classList.add('user-selected');
-        console.log(users[index]);
+    }
+
+    const selectChat = async (index) => {
+        //console.log("selected chat:", index);
+        setSelectedChat(index);
+        setAddFriendClicked(false);
+        setSelectedGroupChat(null);
 
         // if the last message was sent by the login user itself, then don't remove the notification 
         if (chats[index].messages[chats[index].messages.length - 1].sender != userData.email) {
@@ -187,29 +244,73 @@ export default function Home() {
         //console.log("handle add friend clicked");
     }
 
+    const handleSwitchToggle = (e) => {
+        setShowGroupChats(!showGroupChats);
+        setSelectedGroupChat(null);
+        setSelectedChat(null);
+    }
+
+    const getGroupChatDocId = (emails) => {
+
+        // console.log("selected group from home.js:",selectedGroupChat);
+        // console.log("group from home.js:",groupChats[selectedGroupChat]);
+        //console.log("group name:", groupChats[selectedGroupChat].groupName);
+        if (groupChats && selectedChat) {
+            let groupChatDocId = groupChats[selectedChat].groupName;
+            for (let i = 0; i < emails.length; i++) {
+                groupChatDocId = getChatDocId(groupChatDocId, emails[i]);
+            }
+
+            return groupChatDocId;
+        }
+    }
+
     return (
         <div className='home-cont'>
             <div className="home-content">
                 <Card className='users-cont-card' variant="outlined">
-                    <AddFriendNav userData={userData} handleAddFriend={handleAddFriend} handleLogout={handleLogout}/>
+                    <AddFriendNav userData={userData} handleAddFriend={handleAddFriend} handleCreateGroup={handleCreateGroup} handleLogout={handleLogout} />
+                    <FormGroup style={{ display: "flex", height: "5vh", alignItems: "center" }}>
+                        <FormControlLabel control={<Switch onChange={handleSwitchToggle} />} label="Groups" />
+                    </FormGroup>
+
                     <List className='users-cont'>
                         {
-                            friendChats == null || chats == null ? <CircularProgress /> :
-                                chats.map((chatObj, index) => {
-                                    return (
+                            (showGroupChats) ?
+                                (groupChats == null) ? <CircularProgress /> :
+                                    groupChats.map((groupObj, index) => {
+                                        return (
+                                            <ListItem className='user'
+                                                selected={selectedChat == index}
+                                                onClick={() => selectGroupChat(index)} key={uuidv4()}>
+                                                <Avatar sx={{ height: "3rem", width: "3rem" }}> {groupObj.groupName[0]} </Avatar>
+                                                <div className='user-info'>
+                                                    <Typography className='user-email'> {groupObj.groupName} </Typography>
+                                                    <Typography> {groupObj.messages[groupObj.messages.length - 1].sender + ':' + groupObj.messages[groupObj.messages.length - 1].message.substring(0, 15)} </Typography>
+                                                </div>
+                                                {(groupObj.messages[groupObj.messages.length - 1].sender != userData.email) && (groupObj.recieversRead.includes(userData.email)==false) ? <AddAlertIcon /> : null}
+                                            </ListItem>
+                                        )
+                                    })
+                                :
 
-                                        <ListItem className='user'
-                                            selected={selectedChat == index}
-                                            onClick={() => selectChat(index)} key={uuidv4()}>
-                                            <Avatar sx={{ height: "3rem", width: "3rem" }}> {chatObj.userEmails.filter((email) => { return (email != userData.email) })[0].split('@')[0][0]} </Avatar>
-                                            <div className='user-info'>
-                                                <Typography className='user-email'> {friendChats[index]} </Typography>
-                                                <Typography> {chatObj.messages[chatObj.messages.length - 1].message.substring(0, 25)} </Typography>
-                                            </div>
-                                            {(chatObj.messages[chatObj.messages.length - 1].sender != userData.email) && (chatObj.recieverHasRead == false) ? <AddAlertIcon /> : null}
-                                        </ListItem>
-                                    )
-                                })
+
+                                (friendChats == null || chats == null) ? <CircularProgress /> :
+                                    chats.map((chatObj, index) => {
+                                        return (
+
+                                            <ListItem className='user'
+                                                selected={selectedChat == index}
+                                                onClick={() => selectChat(index)} key={uuidv4()}>
+                                                <Avatar sx={{ height: "3rem", width: "3rem" }}> {chatObj.userEmails.filter((email) => { return (email != userData.email) })[0].split('@')[0][0]} </Avatar>
+                                                <div className='user-info'>
+                                                    <Typography className='user-email'> {friendChats[index]} </Typography>
+                                                    <Typography> {chatObj.messages[chatObj.messages.length - 1].message.substring(0, 25)} </Typography>
+                                                </div>
+                                                {(chatObj.messages[chatObj.messages.length - 1].sender != userData.email) && (chatObj.recieverHasRead == false) ? <AddAlertIcon /> : null}
+                                            </ListItem>
+                                        )
+                                    })
                         }
                     </List>
                 </Card>
@@ -217,18 +318,29 @@ export default function Home() {
                 <div className='chats-cont'>
                     <Card className='old-chats-card' variant="outlined">
                         {
-                            addFriendClicked ?
-                                <AddFriend userData={userData}
-                                    getChatDocId={getChatDocId}
-                                    friendChats={friendChats}
-                                    selectChat={selectChat} /> :
-
-                                (friendChats != null && selectedChat != -1 && selectedChat != undefined) ?
-                                    <GetChats chatDataHome={chats[selectedChat].messages}
-                                        userData={userData}
-                                        recieverEmail={friendChats[selectedChat]}
+                            createGroupClicked ?
+                                <CreateGroup
+                                    userData={userData}
+                                    checkDocExists={checkDocExists} /> :
+                                addFriendClicked ?
+                                    <AddFriend userData={userData}
                                         getChatDocId={getChatDocId}
-                                    /> : null
+                                        friendChats={friendChats}
+                                        selectChat={selectChat} /> :
+
+                                    (friendChats != null && selectedChat != -1 && selectedChat != undefined) ?
+                                        <GetChats chatDataHome={chats[selectedChat].messages}
+                                            userData={userData}
+                                            recieverEmail={friendChats[selectedChat]}
+                                            getChatDocId={getChatDocId}
+                                        /> :
+
+                                        (selectedGroupChat != null && selectedGroupChat != undefined) ?
+                                            <GetGroupChats
+                                                userData={userData}
+                                                groupChatData={groupChats[selectedGroupChat]}
+                                                getChatDocId={getChatDocId}
+                                            /> : null
                         }
                     </Card>
 
@@ -239,7 +351,12 @@ export default function Home() {
                                 recieverEmail={!friendChats || selectedChat == null ? null : friendChats[selectedChat]}
                                 getChatDocId={getChatDocId}
                                 checkDocExists={checkDocExists}
-                            /> : null
+                            /> :
+                                (addFriendClicked == false && groupChats!=null && createGroupClicked == false && selectedGroupChat != null) ?
+                                    <NewGroupChat
+                                        userData={userData}
+                                        groupChatData={groupChats[selectedGroupChat]} 
+                                        getGroupChatDocId={getGroupChatDocId}/> : null
                         }
                     </Card>
                 </div>

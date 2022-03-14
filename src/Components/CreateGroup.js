@@ -38,11 +38,11 @@ export default function CreateGroup({ userData, checkDocExists }) {
         let emailsList = emails.trim().split(',');
         emailsList.push(userData.email);
 
-        let groupDocId = emailsList[0];
+        emailsList.sort();
+        let groupDocId = groupName;
 
-
-        for (let i = 1; i < emailsList.length; i++) {
-            groupDocId = getGroupDocId(groupDocId, emailsList[i]);
+        for (let i = 0; i < emailsList.length; i++) {
+            groupDocId = groupDocId + '#@!' + emailsList[i];
         }
 
         let id = uuidv4();
@@ -58,8 +58,10 @@ export default function CreateGroup({ userData, checkDocExists }) {
         // create a group
         if (firstTimeChat==true) {
             const groupDocument = {
+                groupName:groupName,
                 messages: [{ sender: userData.email, message: message, id: id, createdAt: getTimeStamp() }],
-                userEmails: [...emailsList]
+                userEmails: [...emailsList],
+                recieversRead:[]
             }
             await setDoc(docRef, groupDocument);
         }

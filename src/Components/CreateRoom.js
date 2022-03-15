@@ -26,7 +26,7 @@ export default function CreateRoom() {
             const docRef = doc(db, "rooms", roomId);
 
             await updateDoc(docRef, {
-                usersIn:arrayUnion(name)
+                usersIn: arrayUnion(name)
             });
         }
 
@@ -42,7 +42,7 @@ export default function CreateRoom() {
             await setDoc(docRef, roomDocument);
         }
 
-        navigate(`/rooms/${roomId}/${name}`,{submitBtnClicked:"true"});
+        navigate(`/rooms/${roomId}/${name}`, { submitBtnClicked: "true" });
 
         setName('');
         setRoomId('');
@@ -50,27 +50,29 @@ export default function CreateRoom() {
     }
 
     return (
-        <div className='create-room-form'>
-            <TextField
-                id="outlined-search"
-                label="Name"
-                type="search"
-                size='medium'
-                onChange={(e) => setName(e.target.value)}
-                value={name} />
+        <div className='create-room-form-cont'>
+            <div className='create-room-form'>
+                <TextField
+                    id="outlined-search"
+                    label="Name"
+                    type="search"
+                    size='medium'
+                    onChange={(e) => setName(e.target.value)}
+                    value={name} />
 
-            <TextField
-                id="outlined-search"
-                label="Room Id"
-                type="search"
-                size='medium'
-                onChange={(e) => setRoomId(e.target.value)}
-                value={roomId} />
+                <TextField
+                    id="outlined-search"
+                    label="Room Id"
+                    type="search"
+                    size='medium'
+                    onChange={(e) => setRoomId(e.target.value)}
+                    value={roomId} />
 
-            <Button
-                variant="contained"
-                disabled={loading}
-                onClick={handleSubmitClick}> Submit </Button>
+                <Button
+                    variant="contained"
+                    disabled={loading}
+                    onClick={handleSubmitClick}> Submit </Button>
+            </div>
         </div>
     );
 }

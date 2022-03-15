@@ -1,7 +1,7 @@
-import React, { useEffect, useState, useContext } from 'react';
+import React, { useState, useContext } from 'react';
 import TextField from '@mui/material/TextField';
 import './Styles/AddFriend.css';
-import { doc, getDocs, getDoc, setDoc, updateDoc, collection, query, arrayUnion } from "firebase/firestore";
+import { doc, getDoc, setDoc, updateDoc, arrayUnion } from "firebase/firestore";
 import Button from '@mui/material/Button';
 import { db } from '../firebase';
 import './Styles/AddFriend.css';
@@ -72,7 +72,7 @@ export default function AddFriend({ userData, getChatDocId, friendChats, selectC
                 // 2) redirect to that chat index
                 let friendIndex = -1;
                 friendChats.map((email, index) => {
-                    if (email == searchEmail) {
+                    if (email === searchEmail) {
                         friendIndex = index;
                     }
                 })
@@ -108,7 +108,7 @@ export default function AddFriend({ userData, getChatDocId, friendChats, selectC
         <div className='add-friend-cont'>
 
             {
-                error != '' ?
+                error !== '' ?
                     <Alert severity="error"> {error} </Alert> : null
             }
 

@@ -188,9 +188,13 @@ export default function Home() {
 
     const selectGroupChat = async (index) => {
 
-        console.log("called!");
+        // console.log("called!");
         if (groupChats) {
 
+
+            setSelectedGroupChat(index);
+            setSelectedChat(null);
+            setCreateGroupClicked(false);
             // console.log("selected group chat:", selectGroupChat);
             // console.log("selected group chat data from home:", groupChats[index]);
             // console.log("selected group chat name from home:", groupChats[index].groupName);
@@ -214,11 +218,6 @@ export default function Home() {
                     recieversRead: arrayUnion(userData.email)
                 });
             }
-
-            setSelectedGroupChat(index);
-            setSelectedChat(null);
-            setCreateGroupClicked(false);
-
         }
 
     }

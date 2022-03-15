@@ -56,7 +56,7 @@ export default function NewChat({ userData, recieverEmail, getChatDocId, checkDo
                             [{ sender: userEmail1, message: latestChat, id: id, createdAt: getTimeStamp() }],
                         userEmails: [userEmail1, userEmail2], recieverHasRead: false
                     };
-                    console.log("chat document:", chatDocument);
+                    // console.log("chat document:", chatDocument);
                     await setDoc(chatRef, chatDocument);
                 }
                 setLatestChat('');

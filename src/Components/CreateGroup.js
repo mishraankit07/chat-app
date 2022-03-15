@@ -5,14 +5,16 @@ import { v4 as uuidv4 } from 'uuid';
 import { AuthContext } from '../Context/AuthContext';
 import { doc, setDoc, getDoc, updateDoc, arrayUnion } from "firebase/firestore";
 import { db } from '../firebase';
+import { Alert } from '@mui/material';
 import './Styles/CreateGroup.css';
 
-export default function CreateGroup({ userData, checkDocExists,groupChats,selectGroupChatFn }) {
+export default function CreateGroup({ userData, checkDocExists, groupChats, selectGroupChatFn }) {
 
     const [groupName, setGroupName] = useState('');
     const [emails, setEmails] = useState('');
     const [message, setMessage] = useState('');
     const [loading, setLoading] = useState(false);
+    const [error, setError] = useState('');
     const { getTimeStamp } = useContext(AuthContext);
 
     const handleSubmitClick = async () => {
@@ -20,6 +22,24 @@ export default function CreateGroup({ userData, checkDocExists,groupChats,select
         setLoading(true);
         let emailsList = emails.trim().split(',');
         emailsList.push(userData.email);
+
+        // 1) check if all users are registered or not
+
+        /*async function checkAllEmails() {
+            let firstUnregisteredEmail = '';
+            emailsList.forEach(async (email) => {
+                let emailExists = await checkDocExists('users', email.trim());
+                console.log(`${email}: exists or not ?`, emailExists);
+                if (emailExists == false) {
+                    firstUnregisteredEmail = email;
+                }
+            })
+            console.log("first unregisterd mail inside:",firstUnregisteredEmail);
+            return firstUnregisteredEmail;
+        }
+
+        let firstUnregisteredEmail=await checkAllEmails();
+        console.log("first unregistered email:", firstUnregisteredEmail);*/
 
         emailsList.sort();
         let groupDocId = groupName;
@@ -39,12 +59,12 @@ export default function CreateGroup({ userData, checkDocExists,groupChats,select
         const docRef = doc(db, "groups", groupDocId);
 
         // create a group
-        if (firstTimeChat==true) {
+        if (firstTimeChat == true) {
             const groupDocument = {
-                groupName:groupName,
+                groupName: groupName,
                 messages: [{ sender: userData.email, message: message, id: id, createdAt: getTimeStamp() }],
                 userEmails: [...emailsList],
-                recieversRead:[]
+                recieversRead: []
             }
             await setDoc(docRef, groupDocument);
             setLoading(false);
@@ -58,13 +78,13 @@ export default function CreateGroup({ userData, checkDocExists,groupChats,select
                 messages: arrayUnion(chatData),
                 recieverHasRead: false
             });
-            
+
 
             setLoading(false);
 
             // show that group as active for now
-            for(let i=0;i<groupChats.length;i++){
-                if(groupChats[i].groupName==groupName){
+            for (let i = 0; i < groupChats.length; i++) {
+                if (groupChats[i].groupName == groupName) {
                     selectGroupChatFn(i);
                 }
             }
@@ -73,12 +93,15 @@ export default function CreateGroup({ userData, checkDocExists,groupChats,select
         setGroupName('');
         setEmails('');
         setMessage('');
-
-
     }
 
     return (
         <div className='create-group-form'>
+
+            {
+                error != '' ? <Alert severity="error"> {error} </Alert> : null
+            }
+
             <TextField
                 id="outlined-search"
                 label="Enter Group Name"
